@@ -539,13 +539,26 @@ if ( $instance['dropdown'] ) : ?>
 		<p>Select the filter:</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('filter'); ?>_0">
-			<input id="<?php echo $this->get_field_id('filter'); ?>_0" name="<?php echo $this->get_field_name('filter'); ?>" type="radio" value="0" <?php checked( $instance['filter'] || empty($instance['filter']) ); ?> /> None
+<?php // BEGIN egifford 2014_07_22: Fixing undefined index errors: 'filter'.
+/*			<input id="<?php echo $this->get_field_id('filter'); ?>_0" name="<?php echo $this->get_field_name('filter'); ?>" type="radio" value="0" <?php checked( $instance['filter'] || empty($instance['filter']) ); ?> /> None
+*/?>
+			<input id="<?php echo $this->get_field_id('filter'); ?>_0" name="<?php echo $this->get_field_name('filter'); ?>" type="radio" value="0" <?php checked( empty( $instance['filter'] ) || $instance['filter'] ); ?> /> None
+<?php // END egifford 2014_07_22 ?>
 			</label><br />
             <label for="<?php echo $this->get_field_id('filter'); ?>_1">
-            <input id="<?php echo $this->get_field_id('filter'); ?>_1" name="<?php echo $this->get_field_name('filter'); ?>" type="radio" value="1" <?php checked("1" , $instance['filter']); ?> /> Display direct path
+<?php // BEGIN egifford 2014_07_22: Fixing undefined index errors: 'filter'.
+/*			      <input id="<?php echo $this->get_field_id('filter'); ?>_1" name="<?php echo $this->get_field_name('filter'); ?>" type="radio" value="1" <?php checked("1" , $instance['filter']); ?> /> Display direct path
+*/?>
+            <input id="<?php echo $this->get_field_id('filter'); ?>_1" name="<?php echo $this->get_field_name('filter'); ?>" type="radio" value="1" <?php checked( '1', empty( $instance['filter'] ) ? '' : $instance['filter'] ); ?> /> Display direct path
+<?php // END egifford 2014_07_22 ?>
 			</label><br />
 			<label for="<?php echo $this->get_field_id('filter'); ?>_2">
-            <input id="<?php echo $this->get_field_id('filter'); ?>_2" name="<?php echo $this->get_field_name('filter'); ?>" type="radio" value="2" <?php checked("2" , $instance['filter']); ?> /> Display only children of selected item
+<?php
+// BEGIN egifford 2014_07_22: Fixing undefined index errors: 'filter'.
+/*			      <input id="<?php echo $this->get_field_id('filter'); ?>_2" name="<?php echo $this->get_field_name('filter'); ?>" type="radio" value="2" <?php checked("2" , $instance['filter']); ?> /> Display only children of selected item
+*/?>
+            <input id="<?php echo $this->get_field_id('filter'); ?>_2" name="<?php echo $this->get_field_name('filter'); ?>" type="radio" value="2" <?php checked( '2', empty( $instance['filter'] ) ? '' : $instance['filter'] ); ?> /> Display only children of selected item
+<?php // END egifford 2014_07_22 ?>
 			</label>
 		</p>
 		<p><input id="<?php echo $this->get_field_id('include_parent'); ?>" name="<?php echo $this->get_field_name('include_parent'); ?>" type="checkbox" <?php checked(isset($instance['include_parent']) ? $instance['include_parent'] : 0); ?> />&nbsp;<label for="<?php echo $this->get_field_id('include_parent'); ?>"><?php _e('Include parents'); ?></label>
