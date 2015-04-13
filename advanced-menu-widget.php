@@ -25,33 +25,48 @@ function selective_display($itemID, $children_elements, $strict_sub = false) {
 			}
 		}
 	}
-	
+
 }
 
 //the idea for this extented class is from here http://wordpress.stackexchange.com/questions/2802/display-a-only-a-portion-of-the-menu-tree-using-wp-nav-menu/2930#2930
 class Related_Sub_Items_Walker extends Walker_Nav_Menu
-{	
+{
 	var $ancestors = array();
 	var	$selected_children = 0;
 	var $direct_path = 0;
 	var $include_parent = 0;
 	var	$start_depth = 0;
 
-    function start_lvl(&$output, $depth, $args) {
+// BEGIN egifford 2014_07_22: Fixing PHP Strict errors.
+// See http://wordpress.org/support/topic/strict-standards-in-php-54-wp_debug-true
+// and http://wordpress.org/support/topic/several-errors-when-wp_debug-is-on
+//    function start_lvl(&$output, $depth, $args) {
+    function start_lvl(&$output, $depth = 0, $args = array()) {
+// END egifford 2014_07_22
       if ( !$args->dropdown )
       	parent::start_lvl($output, $depth, $args);
       else
       	$indent = str_repeat("\t", $depth); // don't output children opening tag (`<ul>`)
     }
 
-    function end_lvl(&$output, $depth, $args) {
+// BEGIN egifford 2014_07_22: Fixing PHP Strict errors.
+// See http://wordpress.org/support/topic/strict-standards-in-php-54-wp_debug-true
+// and http://wordpress.org/support/topic/several-errors-when-wp_debug-is-on
+//    function end_lvl(&$output, $depth, $args) {
+    function end_lvl(&$output, $depth = 0, $args = array()) {
+// END egifford 2014_07_22
       if ( !$args->dropdown )
       	parent::end_lvl($output, $depth, $args);
       else
       	$indent = str_repeat("\t", $depth); // don't output children closing tag
     }
 
-    function start_el(&$output, $item, $depth, $args){
+// BEGIN egifford 2014_07_22: Fixing PHP Strict errors.
+// See http://wordpress.org/support/topic/strict-standards-in-php-54-wp_debug-true
+// and http://wordpress.org/support/topic/several-errors-when-wp_debug-is-on
+//    function start_el(&$output, $item, $depth, $args){
+    function start_el(&$output, $item, $depth = 0, $args = array(), $id = 0){
+// END egifford 2014_07_22
       if ( !$args->dropdown ) {
 		  parent::start_el($output, $item, $depth, $args);
       } else {
@@ -61,7 +76,7 @@ class Related_Sub_Items_Walker extends Walker_Nav_Menu
 	      parent::start_el($output, $item, $depth, $args);
 
 		  $_root_relative_current = untrailingslashit( $_SERVER['REQUEST_URI'] );
-		  $current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_root_relative_current );      
+		  $current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_root_relative_current );
 
 	      $selected = ( $current_url == untrailingslashit( $item->url ) ) ? ' selected="selected"' : '';
 
@@ -69,21 +84,26 @@ class Related_Sub_Items_Walker extends Walker_Nav_Menu
 	      $output = str_replace('<li', '<option value="'.$item->url.'"'.$selected, $output);
       }
 	  if ( $args->description )
-	  	$output .= sprintf(' <small class="nav_desc">%s</small>', esc_html($item->description));      
+	  	$output .= sprintf(' <small class="nav_desc">%s</small>', esc_html($item->description));
     }
 
-    function end_el(&$output, $item, $depth, $args){
+// BEGIN egifford 2014_07_22: Fixing PHP Strict errors.
+// See http://wordpress.org/support/topic/strict-standards-in-php-54-wp_debug-true
+// and http://wordpress.org/support/topic/several-errors-when-wp_debug-is-on
+//    function end_el(&$output, $item, $depth, $args){
+    function end_el(&$output, $item, $depth = 0, $args = array()){
+// END egifford 2014_07_22
       if ( !$args->dropdown )
       	parent::end_el($output, $item, $depth, $args);
-      else    	
+      else
       	$output .= "</option>\n"; // replace closing </li> with the option tag
-    }	
+    }
 
 	function display_element( $element, &$children_elements, $max_depth, $depth=0, $args, &$output ) {
-		
+
 		if ( !$element )
 			return;
-		
+
 		$id_field = $this->db_fields['id'];
 
 		//display this element
@@ -92,7 +112,7 @@ class Related_Sub_Items_Walker extends Walker_Nav_Menu
 		$cb_args = array_merge( array(&$output, $element, $depth), $args);
 		if ( is_object( $args[0] ) ) {
 	        $args[0]->has_children = ! empty( $children_elements[$element->$id_field] );
-	    }    
+	    }
 
 		$display = ( isset($element->display) ) ? $element->display : 0;
 
@@ -103,41 +123,41 @@ class Related_Sub_Items_Walker extends Walker_Nav_Menu
 		}
 
 		$id = $element->$id_field;
-	    
+
 		// descend only when the depth is right and there are childrens for this element
 		if ( ($max_depth == 0 || $max_depth > $depth+1 ) && isset( $children_elements[$id]) ) {
 
 			foreach( $children_elements[ $id ] as $child ){
 
 				$current_element_markers = array( 'current-menu-item', 'current-menu-parent', 'current-menu-ancestor', 'current_page_item' );
-							
+
 				$descend_test = array_intersect( $current_element_markers, $child->classes );
 
 				if ( $args[0]->strict_sub || !in_array($child->menu_item_parent, $this->ancestors) && !$display )
 						$temp_children_elements = $children_elements;
-									
+
 				if ( !isset($newlevel) ) {
 					$newlevel = true;
 					//start the child delimiter
 					$cb_args = array_merge( array(&$output, $depth), $args);
 
-					if ( ( ($this->selected_children && $display) || !$this->selected_children ) && ( ($this->start_depth && $depth >= $this->start_depth) || !$this->start_depth ) ) {	
+					if ( ( ($this->selected_children && $display) || !$this->selected_children ) && ( ($this->start_depth && $depth >= $this->start_depth) || !$this->start_depth ) ) {
 						if ( ($args[0]->only_related && ($element->menu_item_parent == 0 || (in_array($element->menu_item_parent, $this->ancestors) || $display)))
 							|| (!$args[0]->only_related && ($display || !$args[0]->filter_selection) ) )
 									call_user_func_array(array(&$this, 'start_lvl'), $cb_args);
 					}
-				}												
+				}
 
 				if ( $args[0]->only_related && !$args[0]->filter_selection && ( !in_array($child->menu_item_parent, $this->ancestors) && !$display && !$this->direct_path )
 					|| ( $args[0]->strict_sub && empty( $descend_test ) && !$this->direct_path ) )
-							unset ( $children_elements );		
+							unset ( $children_elements );
 
-				if ( ( $this->direct_path && !empty( $descend_test ) ) || !$this->direct_path ) {	
+				if ( ( $this->direct_path && !empty( $descend_test ) ) || !$this->direct_path ) {
 					$this->display_element( $child, $children_elements, $max_depth, $depth + 1, $args, $output );
 				}
 
 				if ($args[0]->strict_sub || !in_array($child->menu_item_parent, $this->ancestors) && !$display)
-						$children_elements = $temp_children_elements;				
+						$children_elements = $temp_children_elements;
 			}
 			unset( $children_elements[ $id ] );
 		}
@@ -145,7 +165,7 @@ class Related_Sub_Items_Walker extends Walker_Nav_Menu
 		if ( isset($newlevel) && $newlevel ){
 			//end the child delimiter
 			$cb_args = array_merge( array(&$output, $depth), $args);
-			if ( ( ($this->selected_children && $display) || !$this->selected_children ) && ( ($this->start_depth && $depth >= $this->start_depth) || !$this->start_depth ) ) {	
+			if ( ( ($this->selected_children && $display) || !$this->selected_children ) && ( ($this->start_depth && $depth >= $this->start_depth) || !$this->start_depth ) ) {
 				if ( ($args[0]->only_related && ($element->menu_item_parent == 0 || (in_array($element->menu_item_parent, $this->ancestors) || $display)))
 					|| (!$args[0]->only_related && ($display || !$args[0]->filter_selection) ) )
 							call_user_func_array(array(&$this, 'end_lvl'), $cb_args);
@@ -160,7 +180,7 @@ class Related_Sub_Items_Walker extends Walker_Nav_Menu
 						call_user_func_array(array(&$this, 'end_el'), $cb_args);
 		}
 	}
-	
+
 	function walk( $elements, $max_depth) {
 
 		$args = array_slice(func_get_args(), 2);
@@ -186,7 +206,7 @@ class Related_Sub_Items_Walker extends Walker_Nav_Menu
 
 		$id_field = $this->db_fields['id'];
 		$parent_field = $this->db_fields['parent'];
-		
+
 		// flat display
 		if ( -1 == $max_depth ) {
 			$empty_array = array();
@@ -234,17 +254,17 @@ class Related_Sub_Items_Walker extends Walker_Nav_Menu
 				$post_parent = $args[0]->post_parent ? in_array('current-menu-parent',$el->classes) : 0;
 
 				if ( $this->selected_children )
-				{	
+				{
 					if ( $el->current || $post_parent )
 							$args[0]->filter_selection = $el->ID;
-							
+
 				}
-				elseif ( $args[0]->only_related ) 
+				elseif ( $args[0]->only_related )
 				{
 					if ( $el->current || $post_parent ) {
 						$el->display = 1;
 						selective_display($el->ID, $children_elements);
-						
+
 						$ancestors = array();
 						$menu_parent = $el->menu_item_parent;
 			      		while ( $menu_parent && ! in_array( $menu_parent, $ancestors ) ) {
@@ -255,31 +275,31 @@ class Related_Sub_Items_Walker extends Walker_Nav_Menu
 			            $this->ancestors = $ancestors;
 					}
 				}
-				if ( $this->include_parent ) {				
+				if ( $this->include_parent ) {
 					if ( $el->ID == $args[0]->filter_selection )
-							$el->display = 1;	
+							$el->display = 1;
 				}
 
 			}
-		}	
+		}
 		$strict_sub_arg = ( $args[0]->strict_sub ) ? 1 : 0;
 		if ( $args[0]->filter_selection || $this->selected_children )
-				$top_parent = selective_display($args[0]->filter_selection, $children_elements, $strict_sub_arg);			
-		
+				$top_parent = selective_display($args[0]->filter_selection, $children_elements, $strict_sub_arg);
+
 		$current_element_markers = array( 'current-menu-item', 'current-menu-parent', 'current-menu-ancestor', 'current_page_item' );
 
-		foreach ( $top_level_elements as $e ) {				
-			
+		foreach ( $top_level_elements as $e ) {
+
 			if ( $args[0]->only_related ) {
 
 				$temp_children_elements = $children_elements;
-				
+
 				// descend only on current tree
 				$descend_test = array_intersect( $current_element_markers, $e->classes );
-				if ( empty( $descend_test ) && !$this->direct_path )  
+				if ( empty( $descend_test ) && !$this->direct_path )
 					unset ( $children_elements );
 
-				if ( ( $this->direct_path && !empty( $descend_test ) ) || ( !$this->direct_path ) ) {	
+				if ( ( $this->direct_path && !empty( $descend_test ) ) || ( !$this->direct_path ) ) {
 					$this->display_element( $e, $children_elements, $max_depth, 0, $args, $output );
 				}
 
@@ -306,12 +326,12 @@ class Related_Sub_Items_Walker extends Walker_Nav_Menu
 	}
 
 	function widget($args, $instance) {
-		
+
 		$items_wrap = !empty( $instance['dropdown'] ) ? '<select id="amw-'.$this->number.'" class="%2$s amw" onchange="onNavChange(this)"><option value="">Select</option>%3$s</select>' : '<ul id="%1$s" class="%2$s">%3$s</ul>';
 		$only_related_walker = ( $instance['only_related'] == 2 || $instance['only_related'] == 3 || 1 == 1 )? new Related_Sub_Items_Walker : new Walker_Nav_Menu;
 		$strict_sub = $instance['only_related'] == 3 ? 1 : 0;
 		$only_related = $instance['only_related'] == 2 || $instance['only_related'] == 3 ? 1 : 0;
-		$depth = $instance['depth'] ? $instance['depth'] : 0;		
+		$depth = $instance['depth'] ? $instance['depth'] : 0;
 		$container = isset( $instance['container'] ) ? $instance['container'] : 'div';
 		$container_id = isset( $instance['container_id'] ) ? $instance['container_id'] : '';
 		$menu_class = isset( $instance['menu_class'] ) ? $instance['menu_class'] : 'menu';
@@ -344,7 +364,7 @@ class Related_Sub_Items_Walker extends Walker_Nav_Menu
 		if ( $custom_widget_class ) {
 			echo str_replace ('class="', 'class="' . "$custom_widget_class ", $args['before_widget']);
 		} else {
-			echo $args['before_widget'];			
+			echo $args['before_widget'];
 		}
 
 		$instance['title'] = apply_filters('widget_title', $instance['title'], $instance, $this->id_base);
@@ -388,7 +408,7 @@ class Related_Sub_Items_Walker extends Walker_Nav_Menu
 			$nav_menu .= sprintf( $items_wrap, esc_attr( $wrap_id ), esc_attr( $wrap_class ), $wp_nav_menu );
 
 			if ( $show_container )
-				$nav_menu .= '</' . $container . '>';		
+				$nav_menu .= '</' . $container . '>';
 
 			echo $nav_menu;
 
@@ -410,11 +430,11 @@ if ( $instance['dropdown'] ) : ?>
 
 	function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
-		$instance['title'] = strip_tags( stripslashes($new_instance['title']) );		
+		$instance['title'] = strip_tags( stripslashes($new_instance['title']) );
 		$instance['nav_menu'] = (int) $new_instance['nav_menu'];
 		$instance['depth'] = (int) $new_instance['depth'];
 		$instance['only_related'] = !$new_instance['filter_selection'] ? (int) $new_instance['only_related'] : 0;
-		$instance['filter_selection'] = (int) $new_instance['filter_selection'];			
+		$instance['filter_selection'] = (int) $new_instance['filter_selection'];
 		$instance['container'] = $new_instance['container'];
 		$instance['container_id'] = $new_instance['container_id'];
 		$instance['menu_class'] = $new_instance['menu_class'];
@@ -438,7 +458,7 @@ if ( $instance['dropdown'] ) : ?>
 		$title = isset( $instance['title'] ) ? $instance['title'] : '';
 		$nav_menu = isset( $instance['nav_menu'] ) ? $instance['nav_menu'] : '';
 		$only_related = isset( $instance['only_related'] ) ? (int) $instance['only_related'] : 1;
-		$depth = isset( $instance['depth'] ) ? (int) $instance['depth'] : 0;		
+		$depth = isset( $instance['depth'] ) ? (int) $instance['depth'] : 0;
 		$container = isset( $instance['container'] ) ? $instance['container'] : 'div';
 		$container_id = isset( $instance['container_id'] ) ? $instance['container_id'] : '';
 		$menu_class = isset( $instance['menu_class'] ) ? $instance['menu_class'] : 'menu';
@@ -449,7 +469,7 @@ if ( $instance['dropdown'] ) : ?>
 		$filter_selection = isset( $instance['filter_selection'] ) ? (int) $instance['filter_selection'] : 0;
 		$custom_widget_class = isset( $instance['custom_widget_class'] ) ? $instance['custom_widget_class'] : '';
 		$start_depth = isset($instance['start_depth']) ? absint($instance['start_depth']) : 0;
-				
+
 		// Get menus
 		$menus = get_terms( 'nav_menu', array( 'hide_empty' => false ) );
 
@@ -464,11 +484,11 @@ if ( $instance['dropdown'] ) : ?>
 			<input type="text" class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php echo $title; ?>" />
 		</p>
 		<p><input id="<?php echo $this->get_field_id('hide_title'); ?>" name="<?php echo $this->get_field_name('hide_title'); ?>" type="checkbox" <?php checked(isset($instance['hide_title']) ? $instance['hide_title'] : 0); ?> />&nbsp;<label for="<?php echo $this->get_field_id('hide_title'); ?>"><?php _e('Hide title if menu is empty'); ?></label>
-		</p>		
+		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('custom_widget_class'); ?>"><?php _e('Custom Widget Class:') ?></label>
 			<input type="text" class="widefat" id="<?php echo $this->get_field_id('custom_widget_class'); ?>" name="<?php echo $this->get_field_name('custom_widget_class'); ?>" value="<?php echo $custom_widget_class; ?>" />
-		</p>				
+		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('nav_menu'); ?>"><?php _e('Select Menu:'); ?></label>
 			<select id="<?php echo $this->get_field_id('nav_menu'); ?>" name="<?php echo $this->get_field_name('nav_menu'); ?>">
@@ -482,7 +502,7 @@ if ( $instance['dropdown'] ) : ?>
 		</p>
 		<p><input id="<?php echo $this->get_field_id('dropdown'); ?>" name="<?php echo $this->get_field_name('dropdown'); ?>" type="checkbox" <?php checked(isset($instance['dropdown']) ? $instance['dropdown'] : 0); ?> />&nbsp;<label for="<?php echo $this->get_field_id('dropdown'); ?>"><?php _e('Show as dropdown'); ?></label>
 		</p>
-		<p>		
+		<p>
 		<p><label for="<?php echo $this->get_field_id('only_related'); ?>"><?php _e('Show hierarchy:'); ?></label>
 		<select name="<?php echo $this->get_field_name('only_related'); ?>" id="<?php echo $this->get_field_id('only_related'); ?>" class="widefat">
 			<option value="1"<?php selected( $only_related, 1 ); ?>><?php _e('Display all'); ?></option>
@@ -507,13 +527,13 @@ if ( $instance['dropdown'] ) : ?>
 		<p><label for="<?php echo $this->get_field_id('filter_selection'); ?>"><?php _e('Filter selection from:'); ?></label>
 		<select name="<?php echo $this->get_field_name('filter_selection'); ?>" id="<?php echo $this->get_field_id('filter_selection'); ?>" class="widefat">
 		<option value="0"<?php selected( $only_related, 0 ); ?>><?php _e('Display all'); ?></option>
-		<?php 
+		<?php
 		$menu_id = ( $nav_menu ) ? $nav_menu : $menus[0]->term_id;
-		$menu_items = wp_get_nav_menu_items($menu_id); 
+		$menu_items = wp_get_nav_menu_items($menu_id);
 		foreach ( $menu_items as $menu_item ) {
 			echo '<option value="'.$menu_item->ID.'"'.selected( $filter_selection, $menu_item->ID ).'>'.$menu_item->title.'</option>';
 		}
-		?>		
+		?>
 		</select>
 		</p>
 		<p>Select the filter:</p>
@@ -527,13 +547,13 @@ if ( $instance['dropdown'] ) : ?>
 			<label for="<?php echo $this->get_field_id('filter'); ?>_2">
             <input id="<?php echo $this->get_field_id('filter'); ?>_2" name="<?php echo $this->get_field_name('filter'); ?>" type="radio" value="2" <?php checked("2" , $instance['filter']); ?> /> Display only children of selected item
 			</label>
-		</p>	
+		</p>
 		<p><input id="<?php echo $this->get_field_id('include_parent'); ?>" name="<?php echo $this->get_field_name('include_parent'); ?>" type="checkbox" <?php checked(isset($instance['include_parent']) ? $instance['include_parent'] : 0); ?> />&nbsp;<label for="<?php echo $this->get_field_id('include_parent'); ?>"><?php _e('Include parents'); ?></label>
 		</p>
 		<p><input id="<?php echo $this->get_field_id('post_parent'); ?>" name="<?php echo $this->get_field_name('post_parent'); ?>" type="checkbox" <?php checked(isset($instance['post_parent']) ? $instance['post_parent'] : 0); ?> />&nbsp;<label for="<?php echo $this->get_field_id('post_parent'); ?>"><?php _e('Post related parents'); ?></label>
-		</p>	
+		</p>
 		<p><input id="<?php echo $this->get_field_id('description'); ?>" name="<?php echo $this->get_field_name('description'); ?>" type="checkbox" <?php checked(isset($instance['description']) ? $instance['description'] : 0); ?> />&nbsp;<label for="<?php echo $this->get_field_id('description'); ?>"><?php _e('Include descriptions'); ?></label>
-		</p>			
+		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('container'); ?>"><?php _e('Container:') ?></label>
 			<input type="text" class="widefat" id="<?php echo $this->get_field_id('container'); ?>" name="<?php echo $this->get_field_name('container'); ?>" value="<?php echo $container; ?>" />
@@ -542,33 +562,33 @@ if ( $instance['dropdown'] ) : ?>
 		<p>
 			<label for="<?php echo $this->get_field_id('container_id'); ?>"><?php _e('Container ID:') ?></label>
 			<input type="text" class="widefat" id="<?php echo $this->get_field_id('container_id'); ?>" name="<?php echo $this->get_field_name('container_id'); ?>" value="<?php echo $container_id; ?>" />
-			<small><?php _e( 'The ID that is applied to the container.' ); ?></small>			
+			<small><?php _e( 'The ID that is applied to the container.' ); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('menu_class'); ?>"><?php _e('Menu Class:') ?></label>
 			<input type="text" class="widefat" id="<?php echo $this->get_field_id('menu_class'); ?>" name="<?php echo $this->get_field_name('menu_class'); ?>" value="<?php echo $menu_class; ?>" />
-			<small><?php _e( 'CSS class to use for the ul element which forms the menu.' ); ?></small>						
+			<small><?php _e( 'CSS class to use for the ul element which forms the menu.' ); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('before'); ?>"><?php _e('Before the link:') ?></label>
 			<input type="text" class="widefat" id="<?php echo $this->get_field_id('before'); ?>" name="<?php echo $this->get_field_name('before'); ?>" value="<?php echo $before; ?>" />
-			<small><?php _e( htmlspecialchars('Output text before the <a> of the link.') ); ?></small>			
+			<small><?php _e( htmlspecialchars('Output text before the <a> of the link.') ); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('after'); ?>"><?php _e('After the link:') ?></label>
 			<input type="text" class="widefat" id="<?php echo $this->get_field_id('after'); ?>" name="<?php echo $this->get_field_name('after'); ?>" value="<?php echo $after; ?>" />
-			<small><?php _e( htmlspecialchars('Output text after the <a> of the link.') ); ?></small>						
+			<small><?php _e( htmlspecialchars('Output text after the <a> of the link.') ); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('link_before'); ?>"><?php _e('Before the link text:') ?></label>
 			<input type="text" class="widefat" id="<?php echo $this->get_field_id('link_before'); ?>" name="<?php echo $this->get_field_name('link_before'); ?>" value="<?php echo $link_before; ?>" />
-			<small><?php _e( 'Output text before the link text.' ); ?></small>			
+			<small><?php _e( 'Output text before the link text.' ); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('link_after'); ?>"><?php _e('After the link text:') ?></label>
 			<input type="text" class="widefat" id="<?php echo $this->get_field_id('link_after'); ?>" name="<?php echo $this->get_field_name('link_after'); ?>" value="<?php echo $link_after; ?>" />
-			<small><?php _e( 'Output text after the link text.' ); ?></small>			
-		</p>	
+			<small><?php _e( 'Output text after the link text.' ); ?></small>
+		</p>
 		<?php
 	}
 }
@@ -588,9 +608,9 @@ function advMenu_func( $atts ) {
 					'after' 				=> '',
 					'link_before' 			=> '',
 					'link_after' 			=> '',
-					'filter' 				=> '',	
-					'filter_selection' 		=> '',	
-					'include_parent' 		=> '',		
+					'filter' 				=> '',
+					'filter_selection' 		=> '',
+					'include_parent' 		=> '',
 					'start_depth' 			=> '',
 					'hide_title' 			=> '',
 					'custom_widget_class' 	=> ''
