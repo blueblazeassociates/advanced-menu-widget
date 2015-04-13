@@ -1,0 +1,17 @@
+{
+  "name" : "blueblazeassociates/advanced-menu-widget",
+  "description" : "This plugin adds enhanced 'Navigation Menu' widget. It offers many options which could be set to customize the output of the custom menu through the widget.",
+  "type" : "wordpress-plugin",
+  "homepage" : "https://wordpress.org/plugins/advanced-menu-widget/",
+  "license" : "GPL-2.0+",
+  "keywords" : [
+    "custom menus",
+    "custom-menu",
+    "menu",
+    "nav",
+    "navigation",
+    "shortcode",
+    "widget",
+    "widgets"
+  ]
+}
