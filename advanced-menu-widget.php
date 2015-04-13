@@ -37,21 +37,36 @@ class Related_Sub_Items_Walker extends Walker_Nav_Menu
 	var $include_parent = 0;
 	var	$start_depth = 0;
 
-    function start_lvl(&$output, $depth, $args) {
+// BEGIN egifford 2014_07_22: Fixing PHP Strict errors.
+// See http://wordpress.org/support/topic/strict-standards-in-php-54-wp_debug-true
+// and http://wordpress.org/support/topic/several-errors-when-wp_debug-is-on
+//    function start_lvl(&$output, $depth, $args) {
+    function start_lvl(&$output, $depth = 0, $args = array()) {
+// END egifford 2014_07_22
       if ( !$args->dropdown )
       	parent::start_lvl($output, $depth, $args);
       else
       	$indent = str_repeat("\t", $depth); // don't output children opening tag (`<ul>`)
     }
 
-    function end_lvl(&$output, $depth, $args) {
+// BEGIN egifford 2014_07_22: Fixing PHP Strict errors.
+// See http://wordpress.org/support/topic/strict-standards-in-php-54-wp_debug-true
+// and http://wordpress.org/support/topic/several-errors-when-wp_debug-is-on
+//    function end_lvl(&$output, $depth, $args) {
+    function end_lvl(&$output, $depth = 0, $args = array()) {
+// END egifford 2014_07_22
       if ( !$args->dropdown )
       	parent::end_lvl($output, $depth, $args);
       else
       	$indent = str_repeat("\t", $depth); // don't output children closing tag
     }
 
-    function start_el(&$output, $item, $depth, $args){
+// BEGIN egifford 2014_07_22: Fixing PHP Strict errors.
+// See http://wordpress.org/support/topic/strict-standards-in-php-54-wp_debug-true
+// and http://wordpress.org/support/topic/several-errors-when-wp_debug-is-on
+//    function start_el(&$output, $item, $depth, $args){
+    function start_el(&$output, $item, $depth = 0, $args = array(), $id = 0){
+// END egifford 2014_07_22
       if ( !$args->dropdown ) {
 		  parent::start_el($output, $item, $depth, $args);
       } else {
@@ -72,7 +87,12 @@ class Related_Sub_Items_Walker extends Walker_Nav_Menu
 	  	$output .= sprintf(' <small class="nav_desc">%s</small>', esc_html($item->description));
     }
 
-    function end_el(&$output, $item, $depth, $args){
+// BEGIN egifford 2014_07_22: Fixing PHP Strict errors.
+// See http://wordpress.org/support/topic/strict-standards-in-php-54-wp_debug-true
+// and http://wordpress.org/support/topic/several-errors-when-wp_debug-is-on
+//    function end_el(&$output, $item, $depth, $args){
+    function end_el(&$output, $item, $depth = 0, $args = array()){
+// END egifford 2014_07_22
       if ( !$args->dropdown )
       	parent::end_el($output, $item, $depth, $args);
       else
